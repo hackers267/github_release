@@ -7,6 +7,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "tinyget",
 ]
 
 [[package]]
@@ -77,6 +78,12 @@ dependencies = [
  "quote",
  "unicode-xid",
 ]
+
+[[package]]
+name = "tinyget"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9caea0d50a5a5bab5459611b4833ed51d5e62d489b503e4d1afff19b431c4c6"
 
 [[package]]
 name = "unicode-xid"
