@@ -1,6 +1,7 @@
 use std::fs;
 
 extern crate serde_json;
+extern crate tinyget;
 
 fn main() {
     let filename = "repos.json";
@@ -8,6 +9,19 @@ fn main() {
     for url in urls.iter() {
         println!("{}",url);
     }
+    let mut url_iter = urls.iter();
+    let url = url_iter.next().unwrap();
+    let response =match tinyget::get(url).send(){
+        Ok(response) => response,
+        Err(err) => {
+            println!("Network error: {}",&err);
+            std::process::exit(1)
+        }
+    };
+    let str = response.as_bytes();
+    let result:serde_json::Value = serde_json::from_slice(str).unwrap();
+    println!("{:?}",result);
+
 }
 
 fn get_urls(filename: &str) -> Vec<String> {
