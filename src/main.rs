@@ -1,27 +1,35 @@
 use std::fs;
+use tinyget::Error;
 
 extern crate serde_json;
 extern crate tinyget;
 
 fn main() {
     let filename = "repos.json";
-    let urls:Vec<String> = get_urls(filename);
+    let urls: Vec<String> = get_urls(filename);
     for url in urls.iter() {
-        println!("{}",url);
+        println!("{}", url);
     }
     let mut url_iter = urls.iter();
     let url = url_iter.next().unwrap();
-    let response =match tinyget::get(url).send(){
+    let response = match tinyget::get(url).with_header("User-Agent", "github_release").send() {
         Ok(response) => response,
         Err(err) => {
-            println!("Network error: {}",&err);
+            println!("Network error: {}", err);
             std::process::exit(1)
         }
     };
-    let str = response.as_bytes();
-    let result:serde_json::Value = serde_json::from_slice(str).unwrap();
-    println!("{:?}",result);
-
+    match response.as_str() {
+        Ok(str) => {
+            println!("str:{}", str);
+            Ok(str)
+        }
+        Err(err) => {
+            println!("Network error: {}", err);
+            Err(err)
+        }
+    }
+    ;
 }
 
 fn get_urls(filename: &str) -> Vec<String> {
