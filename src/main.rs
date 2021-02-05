@@ -1,8 +1,18 @@
-use std::fs;
-use tinyget::Error;
-
 extern crate serde_json;
 extern crate tinyget;
+
+use std::fs;
+
+use serde::Deserialize;
+use tinyget::Error;
+
+#[derive(Deserialize, Debug)]
+struct Info {
+    id: u32,
+    name: String,
+    body: String,
+    published_at: String,
+}
 
 fn main() {
     let filename = "repos.json";
@@ -12,24 +22,15 @@ fn main() {
     }
     let mut url_iter = urls.iter();
     let url = url_iter.next().unwrap();
-    let response = match tinyget::get(url).with_header("User-Agent", "github_release").send() {
-        Ok(response) => response,
-        Err(err) => {
-            println!("Network error: {}", err);
-            std::process::exit(1)
-        }
-    };
-    match response.as_str() {
-        Ok(str) => {
-            println!("str:{}", str);
-            Ok(str)
-        }
-        Err(err) => {
-            println!("Network error: {}", err);
-            Err(err)
-        }
-    }
-    ;
+    get_data(url);
+}
+
+
+fn get_data(url: &String) -> Vec<Info> {
+    let response = tinyget::get(url).with_header("User-Agent", "github_release").send().expect("some error");
+    let body_str = response.as_str().unwrap();
+    let json: Vec<Info> = serde_json::from_str(body_str).unwrap();
+    return json;
 }
 
 fn get_urls(filename: &str) -> Vec<String> {
